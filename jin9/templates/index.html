@@ -1,4 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>앱 사용하지 않고 main.html 띄우기</h1>
+	<!-- 지도를 표시할 div 입니다 -->
+	<div id="map" style="width:100%;height:500px;"></div>
+
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=931166030fbde8d9046749dce6b74e6e"></script>
+	<script>
+	var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+		mapOption = { 
+			center: new kakao.maps.LatLng(36.38221300, 127.42431130), // 지도의 중심좌표
+			level: 8 // 지도의 확대 레벨
+		};
+
+	// 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+	var map = new kakao.maps.Map(mapContainer, mapOption); 
+	</script>
+
+
+	<script>
+		// DOM트리 만들기 직전에 실행
+		$( document ).ready(function() {
+			// jQuery AJAX
+			$.ajax({
+				type: "POST", //요청 메소드 방식
+				url:"https://api.odcloud.kr/api/uws/v1/inventory?page=1&perPage=1000&serviceKey=o%2FAH1siGfM4kdQRHW5WmK4r%2Fw%2BAAo36rf%2B9m6OPFfYCOq4f0LTiQ5Ufc4vEzTe2JAafXkbGmiJABjirmq4Kbcw%3D%3D",
+				dataType:"json", //서버가 요청 URL을 통해서 응답하는 내용의 타입
+				success : function(rtn){
+					console.log(rtn)
+					for (const element of rtn.data) {
+						
+						var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; 
+						// 마커 이미지의 이미지 크기 입니다
+						var imageSize = new kakao.maps.Size(24, 35); 
+						
+						// 마커 이미지를 생성합니다    
+						var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize); 
+						
+						// 마커를 생성합니다
+						var marker = new kakao.maps.Marker({
+							map: map, // 마커를 표시할 지도
+							position: new kakao.maps.LatLng(element.lat,element.lng), // 마커를 표시할 위치
+							title : element.addr, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+							image : markerImage // 마커 이미지 
+						});
+					}
+
+				},
+				error : function(a, b, c){
+					//통신 실패시 발생하는 함수(콜백)
+					alert("Error!");
+				}
+			});
+		});
+	</script>
 {% endblock %}
